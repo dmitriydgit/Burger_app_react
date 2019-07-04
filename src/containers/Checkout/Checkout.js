@@ -1,23 +1,16 @@
 import React, { Component } from 'react';
-//import classes from './Checkout.css'
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import ContactData from '../Checkout/contactData/ContactData';
 import { Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as actions from '../../store/actions/index';
+
 
 
 class Checkout extends Component {
 
-	// componentWillMount() {
-	// 	this.props.onInitPurchase()
-	// }
-
-
 	checkoutCanceledHandler = () => {
 		this.props.history.goBack();
 	}
-
 
 	checkoutContinuedHandler = () => {
 		this.props.history.replace('/checkout/contact-data');
@@ -39,7 +32,6 @@ class Checkout extends Component {
 			)
 		}
 		return summary
-
 	}
 }
 
@@ -49,14 +41,6 @@ const mapStateToProps = state => {
 		purchased: state.order.purchased
 	}
 }
-
-
-// const mapDispatchToProps = (dispatch) => {
-// 	return {
-// 		onInitPurchase: () => dispatch(actions.purchaseInit())
-// 	}
-// }
-
 
 
 export default connect(mapStateToProps)(Checkout); 

@@ -4,13 +4,10 @@ import BurgerIngredient from './BurgerIngredient/BurgerIngredient';
 import { withRouter } from 'react-router-dom';
 
 const burger = (props) => {
-	console.log(props.ingredients)
 
 	let transformedIngredients = Object.keys(props.ingredients)
 		.map(igKey => {
-			console.log(igKey)
 			return [...Array(props.ingredients[igKey])].map((_, index) => {
-				console.log(props.ingredients[igKey])
 				return (
 					<BurgerIngredient key={igKey + index} type={igKey} />
 				)
@@ -23,8 +20,6 @@ const burger = (props) => {
 	if (transformedIngredients.length === 0) {
 		transformedIngredients = <p>Please, start adding ingredients!</p>
 	}
-
-	//console.log(transformedIngredients)
 
 	return (
 		<div className={classes.Burger}>

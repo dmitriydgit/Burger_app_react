@@ -7,6 +7,8 @@ import Input from '../../../components/UI/Input/Input';
 import { connect } from 'react-redux';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/index';
+import { updateObject, checkValidity } from '../../../shared/utility';
+
 
 
 class ContactData extends Component {
@@ -17,7 +19,6 @@ class ContactData extends Component {
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Your name',
-
 				},
 				value: '',
 				validation: {
@@ -26,13 +27,11 @@ class ContactData extends Component {
 				valid: false,
 				touched: false
 			},
-
 			street: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Your street',
-
 				},
 				value: '',
 				validation: {
@@ -46,7 +45,6 @@ class ContactData extends Component {
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Your ZIP code',
-
 				},
 				value: '',
 				validation: {
@@ -62,7 +60,6 @@ class ContactData extends Component {
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Your country',
-
 				},
 				value: '',
 				validation: {
@@ -76,7 +73,6 @@ class ContactData extends Component {
 				elementConfig: {
 					type: 'email',
 					placeholder: 'Your email',
-
 				},
 				value: '',
 				validation: {
@@ -90,12 +86,10 @@ class ContactData extends Component {
 				elementConfig: {
 					options: [{ value: 'fastest', displayValue: 'fastest' },
 					{ value: 'cheepest', displayValue: 'cheepest' }],
-
 				},
 				valid: true,
 				validation: {},
 				value: 'fastest',
-
 			},
 		},
 		formIsValid: false
@@ -112,44 +106,31 @@ class ContactData extends Component {
 		const order = {
 			ingredients: this.props.ings,
 			price: this.props.price,
-			orderData: formData
+			orderData: formData,
+			userId: this.props.userId
 		}
-
-		this.props.onOrderBurger(order);
+		this.props.onOrderBurger(order, this.props.token);
 	}
 
-	checkValidity(value, rules) {
-		let isValid = true;
-		if (!rules) {
-			return true
-		}
-		if (rules.required) {
-			isValid = value.trim() !== '' && isValid
-		}
-		if (rules.minLength) {
-			isValid = value.length >= rules.minLength && isValid;
-		}
-		if (rules.maxLength) {
-			isValid = value.length <= rules.maxLength && isValid;
-		}
-		return isValid;
-	}
+
 
 	inputChangedHandler = (e, inputIdentifier) => {
-		//console.log(e.target.value)
-		const updatedFormData = { ...this.state.orderForm };
-		const updatedFormEl = { ...updatedFormData[inputIdentifier] };
-		updatedFormEl.value = e.target.value;
 
-		updatedFormEl.valid = this.checkValidity(updatedFormEl.value, updatedFormEl.validation);
-		updatedFormEl.touched = true;
-		updatedFormData[inputIdentifier] = updatedFormEl;
-		//console.log(updatedFormEl)
+		const updatedFormEl = updateObject(this.state.orderForm[inputIdentifier],
+			{
+				value: e.target.value,
+				valid: checkValidity(e.target.value, this.state.orderForm[inputIdentifier].validation),
+				touched: true
+			})
+
+		const updatedFormData = updateObject(this.state.orderForm, {
+			[inputIdentifier]: updatedFormEl
+		})
+
 
 		let formIsValid = true;
 		for (let inputIdentifier in updatedFormData) {
 			formIsValid = updatedFormData[inputIdentifier].valid && formIsValid;
-
 		}
 
 		this.setState({
@@ -165,8 +146,8 @@ class ContactData extends Component {
 				id: key,
 				config: this.state.orderForm[key]
 			})
-
 		}
+
 		let form = (
 			<form onSubmit={this.orderHandler}>
 				{formsElementArray.map(el => {
@@ -203,13 +184,15 @@ const mapStateToProps = state => {
 	return {
 		ings: state.burgerBuilder.ingredients,
 		price: state.burgerBuilder.totalPrice,
-		loading: state.order.loading
+		loading: state.order.loading,
+		token: state.auth.token,
+		userId: state.auth.userId
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+		onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
 	}
 }
 
